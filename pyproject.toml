@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "db-vault"
+version = "0.1.0"
+description = "A CLI utility for backing up and restoring databases (MySQL, PostgreSQL, MongoDB, SQLite)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "db-vault contributors" }]
+keywords = ["database", "backup", "restore", "cli", "mysql", "postgresql", "mongodb", "sqlite"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: System :: Archiving :: Backup",
+]
+
+[project.urls]
+Homepage = "https://github.com/asmwasim/db-vault"
+Repository = "https://github.com/asmwasim/db-vault"
+Issues = "https://github.com/asmwasim/db-vault/issues"
+
+dependencies = [
+    "typer[all]>=0.12.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "structlog>=24.0.0",
+    "psycopg2-binary>=2.9.0",
+    "PyMySQL>=1.1.0",
+    "pymongo>=4.0.0",
+    "boto3>=1.34.0",
+    "zstandard>=0.22.0",
+    "lz4>=4.0.0",
+    "httpx>=0.27.0",
+    "APScheduler>=3.10.0,<4.0.0",
+    "SQLAlchemy>=2.0.0",
+    "tomli-w>=1.0.0",
+    "cryptography>=42.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.0.0",
+    "ruff>=0.4.0",
+    "mypy>=1.0.0",
+    "testcontainers>=4.0.0",
+]
+
+[project.scripts]
+db-vault = "db_vault.cli.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/db_vault"]
+
+[tool.ruff]
+src = ["src"]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
+ignore = ["B008", "B904"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/db_vault/cli/*.py" = ["B008"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
