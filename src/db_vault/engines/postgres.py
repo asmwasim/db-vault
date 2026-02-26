@@ -193,6 +193,10 @@ class PostgresEngine(BaseEngine):
             cmd.append("--clean")
             cmd.append("--if-exists")
 
+        if request.no_owner:
+            cmd.append("--no-owner")
+            cmd.append("--no-acl")
+
         if request.tables:
             for table in request.tables:
                 cmd.extend(["--table", table])
@@ -217,11 +221,21 @@ class PostgresEngine(BaseEngine):
                 text=True,
                 timeout=7200,
             )
-            # pg_restore returns non-zero for warnings too, so we check stderr
-            if result.returncode != 0 and "error" in result.stderr.lower():
-                raise RestoreError(
-                    f"pg_restore failed (exit {result.returncode}): {result.stderr}"
+            # pg_restore returns non-zero for warnings too (e.g. ACL on public schema).
+            # Only treat it as a real failure if stderr contains "FATAL" or "could not"
+            # style errors, not just the benign "errors ignored on restore: N" summary.
+            if result.returncode != 0:
+                stderr_lower = result.stderr.lower()
+                is_fatal = any(
+                    marker in stderr_lower
+                    for marker in ("fatal:", "could not", "no matching", "invalid")
                 )
+                if is_fatal:
+                    raise RestoreError(
+                        f"pg_restore failed (exit {result.returncode}): {result.stderr}"
+                    )
+                if "warning" in stderr_lower:
+                    log.warning("postgres_restore_warnings", stderr=result.stderr.strip())
         except FileNotFoundError:
             raise RestoreError(
                 "pg_restore not found. Install postgresql-client."

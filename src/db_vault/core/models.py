@@ -210,6 +210,7 @@ class RestoreRequest(BaseModel):
     tables: list[str] | None = None
     dry_run: bool = False
     drop_existing: bool = False
+    no_owner: bool = False
 
 
 # ──────────────────── Helpers ────────────────────────────

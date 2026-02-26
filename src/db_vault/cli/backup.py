@@ -213,7 +213,7 @@ def backup_run(
         metadata.duration_seconds = time.time() - start_time
         _save_metadata(metadata)
 
-        console.print(f"\n[bold red]✗ Backup failed: {exc}[/bold red]", err=True)
+        console.print(f"\n[bold red]✗ Backup failed: {exc}[/bold red]")
         log.error("backup_failed", error=str(exc), database=db_config.database)
         raise typer.Exit(code=1)
 
@@ -229,7 +229,7 @@ def backup_run(
                 notifier.notify_failure(metadata)
             console.print("[green]✓[/green] Slack notification sent")
         except Exception as exc:
-            console.print(f"[yellow]⚠ Slack notification failed: {exc}[/yellow]", err=True)
+            console.print(f"[yellow]⚠ Slack notification failed: {exc}[/yellow]")
 
 
 @backup_app.command("list")
