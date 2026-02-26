@@ -38,6 +38,10 @@ def restore_run(
         drop_existing: bool = typer.Option(
             False, "--drop-existing", help="Drop existing objects before restore."
         ),
+        no_owner: bool = typer.Option(
+            False, "--no-owner",
+            help="Skip restoring object ownership (useful for cross-server restores).",
+        ),
         dry_run: bool = typer.Option(
             False, "--dry-run", help="Show what would be restored without executing."
         ),
@@ -133,6 +137,7 @@ def restore_run(
             tables=table_list,
             dry_run=dry_run,
             drop_existing=drop_existing,
+            no_owner=no_owner,
         )
 
         with console.status("[bold blue]Restoring..."):
@@ -148,6 +153,6 @@ def restore_run(
             actual_file.unlink(missing_ok=True)
 
     except Exception as exc:
-        console.print(f"\n[bold red]✗ Restore failed: {exc}[/bold red]", err=True)
+        console.print(f"\n[bold red]✗ Restore failed: {exc}[/bold red]")
         log.error("restore_failed", error=str(exc))
         raise typer.Exit(code=1)
