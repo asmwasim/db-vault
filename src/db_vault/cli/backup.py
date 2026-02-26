@@ -188,6 +188,10 @@ def backup_run(
         metadata.file_path = location
         console.print(f"[green]✓[/green] Stored: {location}")
 
+        # Clean up the temporary file if it was copied to a different location
+        if raw_file.resolve() != Path(location).resolve():
+            raw_file.unlink(missing_ok=True)
+
         # ── Finalise ──
         metadata.status = BackupStatus.COMPLETED
         elapsed = time.time() - start_time
